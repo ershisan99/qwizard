@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 
+@layer base {
+    html {
+        font-family: 'Roboto', sans-serif;
+        @apply bg-slate-900
+    }
+}
+
 .loader {
     width: 48px;
     height: 48px;
@@ -14,6 +21,7 @@
     box-sizing: border-box;
     animation: rotation 2s linear infinite;
 }
+
 .loader::after {
     content: '';
     box-sizing: border-box;
@@ -40,6 +48,7 @@
         transform: rotate(360deg);
     }
 }
+
 @keyframes rotationBack {
     0% {
         transform: rotate(0deg);
