@@ -29,6 +29,7 @@ export type FetchQuestionsParams = {
   difficulty?: Difficulty;
   category?: Category;
   type?: AnswerType;
+  token?: string;
 };
 
 export interface CategoriesRes {
@@ -51,4 +52,12 @@ export const fetchCategories = () => {
   return instance
     .get<CategoriesRes>("/api_category.php")
     .then((res) => res.data.trivia_categories);
+};
+
+export const fetchToken = () => {
+  return instance
+    .get<{ token: string }>("/api_token.php?command=request")
+    .then((res) => {
+      return res.data.token;
+    });
 };

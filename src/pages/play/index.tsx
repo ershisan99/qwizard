@@ -1,9 +1,10 @@
-import { useFetchQuestions } from "../../api/openTrivia/hooks";
+import { useFetchQuestions, useFetchToken } from "../../api/openTrivia/hooks";
 import { Game } from "../../components/game";
 import { FullScreenLoader } from "../../components/loader-full-screen";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 const Play = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -13,9 +14,14 @@ const Play = () => {
     if (isCorrect) setCorrectAnswers([...correctAnswers, currentQuestionIndex]);
     setTotalAnswers(totalAnswers + 1);
   };
+  const localToken = localStorage.getItem("token");
+  const { data: token, isLoading: tokenLoading } = useFetchToken(!localToken);
   const router = useRouter();
   const params = router.query;
-  const { data, isLoading, error } = useFetchQuestions(params);
+  const { data, isLoading, error } = useFetchQuestions(
+    { ...params, token: localToken || token },
+    !tokenLoading
+  );
 
   if (isLoading) return <FullScreenLoader />;
   if (error) return <div>Error</div>;
@@ -57,4 +63,4 @@ const Play = () => {
   );
 };
 
-export default Play;
+export default dynamic(() => Promise.resolve(Play), { ssr: false });
