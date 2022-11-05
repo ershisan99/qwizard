@@ -1,4 +1,5 @@
 import axios from "axios";
+import { removeEmpty } from "../../helpers/helpers";
 
 export const instance = axios.create({
   baseURL: "https://opentdb.com/",
@@ -30,10 +31,24 @@ export type FetchQuestionsParams = {
   type?: AnswerType;
 };
 
+export interface CategoriesRes {
+  trivia_categories: Categories[];
+}
+export interface Categories {
+  id: number;
+  name: string;
+}
+
 export const fetchQuestions = (params: FetchQuestionsParams) => {
   return instance
     .get<Questions>("/api.php?", {
-      params,
+      params: removeEmpty(params),
     })
     .then((res) => res.data);
+};
+
+export const fetchCategories = () => {
+  return instance
+    .get<CategoriesRes>("/api_category.php")
+    .then((res) => res.data.trivia_categories);
 };

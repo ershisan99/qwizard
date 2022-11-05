@@ -1,39 +1,52 @@
 import type { FC } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import parse from "html-react-parser";
-
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
 type GameProps = {
-  options: string[];
   correctAnswer: string;
   question: string;
   onNextClick: () => void;
+  addCorrectAnswerId: (isCorrect: boolean) => void;
+  correctAnswers: number;
+  incorrectAnswers: string[];
+  totalAnswers: number;
 };
 
 export const Game: FC<GameProps> = ({
   correctAnswer,
-  options,
   question,
   onNextClick,
+  addCorrectAnswerId,
+  correctAnswers,
+  totalAnswers,
+  incorrectAnswers,
 }) => {
   const [answer, setAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-
+  const options = useMemo(
+    () => [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5),
+    [correctAnswer, incorrectAnswers]
+  );
   const handleAnswered = (option: string) => {
     if (option === correctAnswer) {
       setIsCorrect(true);
+      addCorrectAnswerId(true);
     } else {
       setIsCorrect(false);
+      addCorrectAnswerId(false);
     }
     setAnswer(option);
   };
 
   return (
-    <>
-      <main
-        className={
-          "flex h-screen w-screen w-full flex-col items-start gap-4 p-4"
-        }
-      >
+    <div className={"flex h-screen w-screen flex-col gap-6 p-4"}>
+      <header>
+        <Link className={"flex items-center gap-3 text-sm"} href={"/"}>
+          <ArrowLeftIcon className={"h-4 w-4"} /> Go home
+        </Link>
+      </header>
+      <main className={"flex h-full w-full w-full flex-col items-start gap-4"}>
         <div className={"text-2xl font-bold text-slate-100"}>
           {parse(question)}
         </div>
@@ -53,19 +66,23 @@ export const Game: FC<GameProps> = ({
           ))}
         </div>
 
-        <button
-          className={
-            "w-full rounded-3xl bg-sky-900 p-3 text-center text-2xl text-white"
-          }
-          onClick={() => {
-            onNextClick();
-            setAnswer(null);
-          }}
-        >
-          Next
-        </button>
+        <div className={"flex w-full flex-col gap-2"}>
+          <p className={"w-full text-center"}>
+            Correct Answers: {`${correctAnswers}/${totalAnswers}`}
+          </p>
+          <button
+            className={"btn"}
+            onClick={() => {
+              onNextClick();
+              setAnswer(null);
+              setIsCorrect(null);
+            }}
+          >
+            Next
+          </button>
+        </div>
       </main>
-    </>
+    </div>
   );
 };
 
